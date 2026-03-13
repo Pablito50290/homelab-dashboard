@@ -3,65 +3,141 @@
 <head>
     <title>Pablo Homelab</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+
 <style>
-        /* 1. Le fond de la page (Dark Mode) */
+        /* --- DESIGN GLOBAL & DARK MODE --- */
         body {
-            background-color: #2c2c2e; /* Ton fond gris foncé */
-            color: white; /* Le texte principal en blanc */
-            font-family: -apple-system, sans-serif; /* Une police moderne style iPhone */
+            background-color: #2c2c2e; /* Ton fond gris foncé d'origine */
+            color: #d1d1d6; /* Texte clair mais pas blanc pur pour moins de fatigue visuelle */
+            font-family: -apple-system, sans-serif;
+            margin: 0;
             padding: 20px;
         }
 
-        /* 2. La disposition en grille (2 colonnes) */
-        #ma-grille {
+        h3 {
+            color: #78d672; /* Titres de blocs en vert, ton vert d'origine */
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        /* --- NOTRE GRILLE DE LAYOUT PRO (Le "Moteur" Figma) --- */
+        #dashboard {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* "1 fraction" pour chaque colonne = 50/50 */
-            gap: 15px; /* L'écart entre les cartes */
-            max-width: 400px; /* Sur PC, on limite la largeur pour garder l'effet mobile */
+            /* On crée une grille à 2 colonnes comme Figma (Côté gauche / Côté droit) */
+            grid-template-columns: 2fr 1fr; /* 2 parts pour la gauche, 1 part pour la droite */
+            gap: 20px;
+            max-width: 1200px; /* Sur PC, on limite la largeur pour le design */
+            margin: 0 auto; /* Centré sur l'écran */
         }
 
-        /* 3. Le design de tes cartes vertes */
+        /* Pour mobiles, on empile tout en une colonne */
+        @media (max-width: 768px) {
+            #dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- STYLE DES NOUVEAUX BLOCS (.bloc) --- */
+        /* C'est la structure commune inspirée de Figma, mais "Dark/Green" */
+        .bloc {
+            background-color: #3a3a3c; /* Un gris légèrement plus clair que le fond */
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Ombre douce comme Figma */
+            border: 1px solid rgba(120, 214, 114, 0.1); /* Fine bordure verte très discrète */
+        }
+
+        /* --- STYLE DE TES CARTES DE CAPTEURS D'ORIGINE --- */
+        #capteurs-block #ma-grille {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         .carte {
-            background-color: #78d672; /* Le vert pomme de ton dessin */
-            color: black; /* Le texte à l'intérieur en noir */
-            border-radius: 15px; /* Les bords arrondis */
-            padding: 15px; /* L'espace à l'intérieur de la carte */
-            font-weight: bold; /* Texte en gras */
-            font-size: 20px; /* Texte plus grand */
+            background-color: #78d672; /* Ton vert pomme pétant */
+            color: black;
+            border-radius: 15px;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 18px;
         }
 
-        /* On enlève l'espace par défaut autour des textes dans tes cartes */
-        .carte p {
-            margin: 5px 0;
-        }
+        .carte p { margin: 5px 0; }
+
+        /* --- STYLE DES ÉTATS DYNAMIQUES (Le petit plus !) --- */
+        .alerte-chaud { background-color: #ff6b6b !important; color: white !important; } /* Carte rouge */
+        .presence-active { color: #f9d854 !important; } /* Texte jaune pour "Présence" */
+
+        /* --- STYLE DES NOUVEAUX BLOCS SPÉCIFIQUES --- */
+        /* Bloc Météo */
+        .meteo-valeur { font-size: 48px; font-weight: bold; color: white; margin: 0; }
+        
+        /* Bloc Documents */
+        .docs-liste { list-style: none; padding: 0; margin: 0; }
+        .docs-liste li { margin-bottom: 10px; }
+        .docs-liste a { text-decoration: none; color: #d1d1d6; font-size: 16px; }
+        .docs-liste a i { color: #78d672; margin-right: 10px; } /* Icônes en vert */
+        .docs-liste a:hover { color: #78d672; } /* Au survol, le lien devient vert */
+
+        /* Bloc Calendrier */
+        .calendrier-info p { margin: 5px 0; color: #d1d1d6; }
+        .calendrier-info p:first-child { font-weight: bold; color: white; }
     </style>
 
 </head>
 <body>
-    <h1>13 Mars 2026</h1>
-    <h2>Bureau</h2>
 
-    <div id="ma-grille">
-        
-        <div class="carte">
-            <p>Température</p>
-            <p id="valeur-temp">-- °C</p>
+    <div id="dashboard">
+
+        <div class="bloc" id="capteurs-block">
+            <h3>Capteurs Bureau</h3>
+            <div id="ma-grille">
+                <div class="carte">
+                    <p>Température</p>
+                    <p><i class="fas fa-thermometer-half"></i> Température</p>
+                </div>
+                <div class="carte">
+                    <p>Humidité</p>
+                    <p><i class="fas fa-tint"></i> Humidité</p>
+                </div>
+                <div class="carte">
+                    <p>Luminosité</p>
+                    <p><i class="fas fa-lightbulb"></i> Luminosité</p>
+                </div>
+                <div class="carte">
+                    <p>Présence</p>
+                    <p><i class="fas fa-user-check"></i> Présence</p>
+                </div>
+            </div>
         </div>
 
-        
-        <div class="carte">
-            <p>Humidité</p>
-            <p id="valeur-hum">-- %</p>
+        <div class="bloc" id="meteo-block">
+            <h3>Météo Bréhal</h3>
+            <div class="meteo-info">
+                <p class="meteo-valeur">22°C</p>
+                <p>Ciel Dégagé</p>
+            </div>
         </div>
-        
-        <div class="carte">
-            <p>Luminosité</p>
-            <p id="valeur-lum">-- lx</p>
+
+        <div class="bloc" id="documents-block">
+            <h3>Documents Cloud</h3>
+            <ul class="docs-liste">
+                <li><a href="#"><i class="fas fa-file-pdf"></i> Tax Documents 2026.pdf</a></li>
+                <li><a href="#"><i class="fas fa-file-invoice"></i> Insurance Policy.pdf</a></li>
+                <li><a href="#"><i class="fas fa-file-excel"></i> Home Inventory.xlsx</a></li>
+            </ul>
         </div>
-        
-        <div class="carte">
-            <p>Présence</p>
-            <p id="valeur-pres">--</p>
+
+        <div class="bloc" id="calendrier-block">
+            <h3>Apple Calendar</h3>
+            <div class="calendrier-info">
+                <p>13 Mars 2026</p>
+                <p>Réunion à 10h</p>
+            </div>
         </div>
 
     </div>
