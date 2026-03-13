@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pablo Homelab</title>
+
+<style>
+        /* 1. Le fond de la page (Dark Mode) */
+        body {
+            background-color: #2c2c2e; /* Ton fond gris foncé */
+            color: white; /* Le texte principal en blanc */
+            font-family: -apple-system, sans-serif; /* Une police moderne style iPhone */
+            padding: 20px;
+        }
+
+        /* 2. La disposition en grille (2 colonnes) */
+        #ma-grille {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* "1 fraction" pour chaque colonne = 50/50 */
+            gap: 15px; /* L'écart entre les cartes */
+            max-width: 400px; /* Sur PC, on limite la largeur pour garder l'effet mobile */
+        }
+
+        /* 3. Le design de tes cartes vertes */
+        .carte {
+            background-color: #78d672; /* Le vert pomme de ton dessin */
+            color: black; /* Le texte à l'intérieur en noir */
+            border-radius: 15px; /* Les bords arrondis */
+            padding: 15px; /* L'espace à l'intérieur de la carte */
+            font-weight: bold; /* Texte en gras */
+            font-size: 20px; /* Texte plus grand */
+        }
+
+        /* On enlève l'espace par défaut autour des textes dans tes cartes */
+        .carte p {
+            margin: 5px 0;
+        }
+    </style>
+
+</head>
+<body>
+    <h1>13 Mars 2026</h1>
+    <h2>Bureau</h2>
+
+    <div id="ma-grille">
+        
+        <div class="carte">
+            <p>Température</p>
+            <p id="valeur-temp">-- °C</p>
+        </div>
+
+        
+        <div class="carte">
+            <p>Humidité</p>
+            <p id="valeur-hum">-- %</p>
+        </div>
+        
+        <div class="carte">
+            <p>Luminosité</p>
+            <p id="valeur-lum">-- lx</p>
+        </div>
+        
+        <div class="carte">
+            <p>Présence</p>
+            <p id="valeur-pres">--</p>
+        </div>
+
+    </div>
+
+</body>
+
+<script>
+        // Ton pseudo Adafruit
+        const username = "pablito0750";
+
+        // C'est cette fonction qui fait tout le travail
+        function actualiserDonnees() {
+            
+            // 1. Température
+        fetch(`https://io.adafruit.com/api/v2/${username}/feeds/temperature`)
+            .then(reponse => reponse.json())
+            .then(donnee => {
+                // ICI : On utilise donnee.last_value
+                document.getElementById('valeur-temp').innerText = parseFloat(donnee.last_value).toFixed(1) + " °C";
+            });
+
+        // 2. Humidité
+        fetch(`https://io.adafruit.com/api/v2/${username}/feeds/humidite`)
+            .then(reponse => reponse.json())
+            .then(donnee => {
+                // ICI : On utilise donnee.last_value
+                document.getElementById('valeur-hum').innerText = parseFloat(donnee.last_value).toFixed(0) + " %";
+            });
+
+        // 3. Luminosité
+        fetch(`https://io.adafruit.com/api/v2/${username}/feeds/luminosite`)
+            .then(reponse => reponse.json())
+            .then(donnee => {
+                // ICI : On utilise donnee.last_value
+                document.getElementById('valeur-lum').innerText = parseFloat(donnee.last_value).toFixed(0) + " lx";
+            });
+
+        // 4. Présence
+        fetch(`https://io.adafruit.com/api/v2/${username}/feeds/presence`)
+            .then(reponse => reponse.json())
+            .then(donnee => {
+                // ICI : On utilise donnee.last_value
+                if (donnee.last_value === "1") {
+                    document.getElementById('valeur-pres').innerText = "Oui";
+                } else {
+                    document.getElementById('valeur-pres').innerText = "Non";
+                }
+            });
+        }
+
+        // On lance la mise à jour une première fois dès l'ouverture de la page
+        actualiserDonnees();
+        
+        // Puis on dit au navigateur de le refaire en boucle toutes les 10 secondes (10 000 millisecondes)
+        setInterval(actualiserDonnees, 10000);
+
+    </script>
+
+</html>
+
