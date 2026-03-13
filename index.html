@@ -118,8 +118,8 @@
         <div class="bloc" id="meteo-block">
             <h3>Météo Bréhal</h3>
             <div class="meteo-info">
-                <p class="meteo-valeur">22°C</p>
-                <p>Ciel Dégagé</p>
+                <p class="meteo-valeur" id="meteo-ext-temp">-- °C</p>
+                <p id="meteo-ext-desc">Chargement...</p>
             </div>
         </div>
 
@@ -132,12 +132,17 @@
             </ul>
         </div>
 
-        <div class="bloc" id="calendrier-block">
-            <h3>Apple Calendar</h3>
-            <div class="calendrier-info">
-                <p>13 Mars 2026</p>
-                <p>Réunion à 10h</p>
-            </div>
+        <div class="bloc" id="documents-block">
+            <h3>Raccourcis</h3>
+            <ul class="docs-liste">
+                <li><a href="https://drive.google.com" target="_blank"><i class="fab fa-google-drive"></i> Google Drive</a></li>
+                
+                <li><a href="https://unicaenfr-my.sharepoint.com/?source=waffle" target="_blank"><i class="fas fa-cloud"></i>One Drive</a></li>
+                
+                <li><a href="https://github.com/pablito0750" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
+                
+                <li><a href="https://courtincpge.net" target="_blank"><i class="fas fa-graduation-cap"></i>Courtin CPGE</a></li>
+            </ul>
         </div>
 
     </div>
@@ -148,16 +153,55 @@
         // Ton pseudo Adafruit
         const username = "pablito0750";
 
+        // --- API MÉTÉO ---
+        const cleMeteo = "874a77bd1d13c6d827177fc9b984b5ff"; 
+        const ville = "Bréhal,fr";
+
+        function actualiserMeteo() {
+            // On fait une requête à OpenWeatherMap en demandant des degrés Celsius (metric) et en français (lang=fr)
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${ville}&appid=${cleMeteo}&units=metric&lang=fr`)
+                .then(reponse => reponse.json())
+                .then(donnee => {
+                    // On arrondit la température pour pas avoir de virgule (ex: 22°C)
+                    document.getElementById('meteo-ext-temp').innerText = Math.round(donnee.main.temp) + " °C";
+                    
+                    // On récupère la description (ex: "nuageux") et on met la première lettre en majuscule
+                    let description = donnee.weather[0].description;
+                    document.getElementById('meteo-ext-desc').innerText = description.charAt(0).toUpperCase() + description.slice(1);
+                })
+                .catch(erreur => console.log("Erreur météo:", erreur));
+        }
+
+        // On lance la météo au chargement de la page
+        actualiserMeteo();
+        
+        // On actualise la météo toutes les 30 minutes (1 800 000 millisecondes) 
+        // Pas besoin de le faire toutes les 10 secondes comme pour ton bureau !
+        setInterval(actualiserMeteo, 1800000);
+
+        // Adafruit
+
         // C'est cette fonction qui fait tout le travail
         function actualiserDonnees() {
             
-            // 1. Température
-        fetch(`https://io.adafruit.com/api/v2/${username}/feeds/temperature`)
-            .then(reponse => reponse.json())
-            .then(donnee => {
-                // ICI : On utilise donnee.last_value
-                document.getElementById('valeur-temp').innerText = parseFloat(donnee.last_value).toFixed(1) + " °C";
-            });
+         // 1. On va chercher la Température
+            fetch(`https://io.adafruit.com/api/v2/${username}/feeds/temperature`)
+                .then(reponse => reponse.json())
+                .then(donnee => {
+                    let temp = parseFloat(donnee.last_value);
+                    document.getElementById('valeur-temp').innerText = temp.toFixed(1) + " °C";
+                    
+                    // --- LA MAGIE DYNAMIQUE ---
+                    // On cible la boîte verte (le parent du texte)
+                    let boiteTemp = document.getElementById('valeur-temp').parentElement;
+                    
+                    // Si la température dépasse 25°C, on ajoute la classe rouge !
+                    if (temp > 25) {
+                        boiteTemp.classList.add("alerte-chaud");
+                    } else {
+                        boiteTemp.classList.remove("alerte-chaud");
+                    }
+                });
 
         // 2. Humidité
         fetch(`https://io.adafruit.com/api/v2/${username}/feeds/humidite`)
